@@ -1,16 +1,36 @@
+from dataclasses import dataclass
+
 from .db import db
+from flask_bcrypt import generate_password_hash
 
 
-class Todo(db.Model):
-    __tablename__ = 'todo'
+@dataclass
+class User(db.Model):
+    __tablename__ = 'user'
+
+    id: int
+    username: str
+    password: str
 
     id = db.Column(db.Integer, primary_key=True)
-    uesrname = db.Column(db.String(256))
+    username = db.Column(db.String(256))
     password = db.Column(db.String(256))
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'uesrname': self.username,
+            'username': self.username,
         }
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = self.password_hash(password)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def password_hash(password):
+        return generate_password_hash(password).decode('utf8')
