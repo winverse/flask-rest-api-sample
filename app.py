@@ -1,15 +1,19 @@
 
 from flask import Flask
 from flask_restful import Api
+from flask_jwt_extended import JWTManager
 
 from database.db import initialize_db
 from resources.routes import initialize_routes
 
 app = Flask(__name__)
 
-api = Api(app)
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config['JWT_SECRET_KEY'] = 'flask-rest-api-example'
 
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+api = Api(app)
+jwt = JWTManager(app)
 
 initialize_routes(api)
 initialize_db(app)

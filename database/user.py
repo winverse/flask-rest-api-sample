@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from .db import db
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 
 
 @dataclass
@@ -17,7 +17,7 @@ class User(db.Model):
     password = db.Column(db.String(256))
 
     @property
-    def serialize(self):
+    def json(self):
         return {
             'id': self.id,
             'username': self.username,
@@ -30,6 +30,9 @@ class User(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     @staticmethod
     def password_hash(password):
