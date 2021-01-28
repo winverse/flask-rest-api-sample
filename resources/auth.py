@@ -29,22 +29,23 @@ class LoginApi(Resource):
     def post(self):
         body = request.get_json()
 
-        if body == None:
+        if body is None:
             return {"message": "BAD_REQUEST"}, 400
 
         username = body.get('username')
         password = body.get('password')
 
-        if not username or not password:
+        if username is None or password is None:
             return {"message": "BAD_REQUEST"}, 400
 
         user = User.query.filter_by(username=username).first()
         authorize = user.check_password(password)
 
-        if not authorize:
+        if authorize is None:
             return {"message": "Wrong password"}, 401
 
         expires = datetime.timedelta(days=7)
+
         access_token = create_access_token(
             identity=str(user.id), expires_delta=expires)
 
